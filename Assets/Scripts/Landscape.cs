@@ -29,7 +29,7 @@ public class Landscape : MonoBehaviour
 	{
 		TerrainType[] allValues =
 			(TerrainType[])Enum.GetValues(typeof(TerrainType));
-		TerrainType value = allValues[UnityEngine.Random.Range(0, allValues.Length-1)]; //not water
+		TerrainType value = allValues[UnityEngine.Random.Range(0, allValues.Length)]; //not water
 		
 		return value;
 	}
@@ -70,17 +70,16 @@ public class Landscape : MonoBehaviour
         //Create blocks
         CreateBlocks();
 
+		//Create terrain
+		for (int i = 0; i < mLandscape.Length; i++)
+		{
+			var terrain = Landscape.RandomTerrainType();
+			mLandscape[i].Terrain = terrain;
+			mLandscape[i].maxPopulation = TerrainPopulation[terrain];
+		}
+
         //Wire up connections between blocks
         ConnectBlocks();
-
-        //Create terrain
-        for (int i = 0; i < mLandscape.Length; i++)
-        {
-			var terrain = Landscape.RandomTerrainType();
-            mLandscape[i].Terrain = terrain;
-			mLandscape[i].maxPopulation = TerrainPopulation[terrain];
-        }
-
 	}
 
     private void ConnectBlocks()
@@ -93,6 +92,9 @@ public class Landscape : MonoBehaviour
         for (int i = 0; i < mLandscape.Length; i++)
         {
             block = mLandscape[i];
+			if(block.Terrain == TerrainType.Water)
+				continue; //no connections 
+
             RowColFromIndex(i, out row, out col);
 
             if (row - 1 > 0)
