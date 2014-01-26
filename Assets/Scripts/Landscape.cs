@@ -18,11 +18,11 @@ public class Landscape : MonoBehaviour
 	public static Dictionary<TerrainType, int> TerrainPopulation = new Dictionary<TerrainType, int>()
 	{
 		{TerrainType.Water,		0},
-		{TerrainType.Desert,	1},
-		{TerrainType.Mountain, 	2},
+		{TerrainType.Desert,	2},
+		{TerrainType.Mountain, 	3},
 		{TerrainType.Hills,		4},
-		{TerrainType.Forest,	6},
-		{TerrainType.Plains,	8}
+		{TerrainType.Forest,	5},
+		{TerrainType.Plains,	6}
 	};
 
 	public static TerrainType RandomTerrainType()
