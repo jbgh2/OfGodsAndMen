@@ -26,6 +26,7 @@
 
 //For more information, please refer to <http://unlicense.org/>
 
+//From http://code.google.com/p/simplexnoise/
 
 namespace SimplexNoise
 {
