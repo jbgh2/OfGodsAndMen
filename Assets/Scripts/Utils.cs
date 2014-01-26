@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 
+//From: http://stackoverflow.com/questions/273313/randomize-a-listt-in-c-sharp
 public static class ThreadSafeRandom
 {
 	[ThreadStatic] private static Random Local;
