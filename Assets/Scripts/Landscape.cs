@@ -39,6 +39,7 @@ public class Landscape : MonoBehaviour
 	public bool ShowNeighbours = false;
 	public bool terrainUsingNoise = true;
 	public int noiseSeed = -1;
+	public float noiseResolution = 1.0f;
     public int NumRows = 3;
     public int NumColumns = 3;
     public GameObject LandscapeBlockPrefab = null;
@@ -164,7 +165,7 @@ public class Landscape : MonoBehaviour
 		{
 			for (int col = 0; col < mWidth; col++)
 			{
-				var n = Noise.Generate(row, col);
+				var n = Noise.Generate(row * noiseResolution, col * noiseResolution);
 
 				//Assume range is -1 to 1
 				var height = (n + 1f) / 2f;
