@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
 		Aging,
 		GameOver
 	}
+	private Phases lastPhase;
 	private Phases phase;
 	private Phases nextPhase;
 	private int turn;
@@ -85,6 +86,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Placement:
 		{
+			lastPhase = Phases.Placement;
 			if(godIndex == gods.Length || Input.GetKeyUp(KeyCode.N))
 			{
 				nextPhase = Phases.Reproduction;
@@ -114,6 +116,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Reproduction:
 		{
+			lastPhase = Phases.Reproduction;
 			Reproduction();
 			phase = Phases.Waiting;
 			nextPhase = Phases.Migration;
@@ -122,6 +125,7 @@ public class GameController : MonoBehaviour
 					
 		case Phases.Migration:
 		{
+			lastPhase = Phases.Migration;
 			Migration();
 			phase = Phases.Waiting;
 			nextPhase = Phases.Conflict;
@@ -130,6 +134,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Conflict:
 		{
+			lastPhase = Phases.Conflict;
 			Conflict();
 			phase = Phases.Waiting;
 			nextPhase = Phases.Conversion;
@@ -138,6 +143,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Conversion:
 		{
+			lastPhase = Phases.Conversion;
 			Conversion();
 			phase = Phases.Waiting;
 			nextPhase = Phases.Aging;
@@ -146,6 +152,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Aging:
 		{
+			lastPhase = Phases.Aging;
 			Aging();
 			if(++turn <= turnsInGame)
 			{
@@ -160,8 +167,9 @@ public class GameController : MonoBehaviour
 		}
 		break;
 
-			case Phases.GameOver:
-				break;
+		case Phases.GameOver:
+			lastPhase = Phases.GameOver;
+			break;
 
 			default:
 				break;
@@ -241,6 +249,46 @@ public class GameController : MonoBehaviour
 			p.owner.score += p.age;
 			GameObject.Destroy(p.gameObject);
 		}
+	}
+
+	void OnGUI()
+	{
+		var rightStyle = new GUIStyle(GUI.skin.label);
+		rightStyle.alignment = TextAnchor.MiddleRight;
+
+		var centerStyle = new GUIStyle(GUI.skin.label);
+		centerStyle.alignment = TextAnchor.MiddleCenter;
+		
+		var leftStyle = new GUIStyle(GUI.skin.label);
+		leftStyle.alignment = TextAnchor.MiddleLeft;
+
+		//Top left. Tile info.
+		if(landscape.selectedBlock != null)
+		{
+			GUILayout.BeginArea(new Rect(10, 10, 200, 200));
+			GUILayout.Label(landscape.selectedBlock.Terrain.ToString(), leftStyle);
+			GUILayout.Label("Pop: " + landscape.selectedBlock.population.Count, leftStyle);
+			GUILayout.Label("Max: " + landscape.selectedBlock.maxPopulation, leftStyle);
+			GUILayout.EndArea();
+		}
+
+		//Center. Turn and phase
+		GUILayout.BeginArea(new Rect((Screen.width / 2) - 50, 10, 50, 20));
+		GUILayout.Label(turn + " / " + turnsInGame, centerStyle);
+		GUILayout.EndArea();
+		
+		GUILayout.BeginArea(new Rect((Screen.width / 2), 10, 200, 20));
+		GUILayout.Label(lastPhase.ToString(), centerStyle);
+		GUILayout.EndArea();
+
+		//Top right. Scores
+		GUILayout.BeginArea(new Rect(Screen.width - 150, 10, 140, 200));
+		foreach(var god in gods)
+		{
+			GUILayout.Label(god.name + " : " + god.score.ToString(), rightStyle);
+		}
+		GUILayout.EndArea();
+
 	}
 
 }
