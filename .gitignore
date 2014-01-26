@@ -7,4 +7,6 @@
 *.unityproj
 *.sln
 
-*.meta
+*.pidb
+*.mdb
+*.DotSettings
