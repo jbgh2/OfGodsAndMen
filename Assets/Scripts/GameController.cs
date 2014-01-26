@@ -70,7 +70,6 @@ public class GameController : MonoBehaviour
 		//Give the population a god
 		newPop.owner = god;
 		newPop.age = age;
-		newPop.body.renderer.material.color = god.color;
 
 		return newPop;
 	}
@@ -86,7 +85,7 @@ public class GameController : MonoBehaviour
 
 		case Phases.Placement:
 		{
-			if(godIndex == gods.Length)
+			if(godIndex == gods.Length || Input.GetKeyUp(KeyCode.N))
 			{
 				nextPhase = Phases.Reproduction;
 				phase = Phases.Waiting;

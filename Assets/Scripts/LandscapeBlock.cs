@@ -5,6 +5,8 @@ using System;
 using Holoville.HOTween;
 using Holoville.HOTween.Plugins;
 
+using System.Linq;
+
 public class LandscapeBlock : MonoBehaviour 
 {
     public enum Neighbours
@@ -355,25 +357,49 @@ public class LandscapeBlock : MonoBehaviour
 			migrants = eligablePop.GetRange(0, diff);
 		}
 
+		if(migrants.Count == 0)
+			return;
+
 		//Work out where to send each migrant
-		//TODO: Make smarter, choose the neighbor with the most space 
-		//but bear in mind what each other migrant is going to do.
-		//For now, pick at random
+		//Choose the neighbor with the most space 
+		var emptiestNeighbour = FindEmptiestNieghbour();
+
 		foreach(var m in migrants)
 		{
 			population.Remove(m);
 
-			var edge = GetRandomEdge();
-			var target = this[edge];
-
+			var target = this[emptiestNeighbour];
 			target.immigrants.Add(m);
 
 			//Position the migrants at the edge of the target block
-			var edgePos = GetPositionOnEdge(edge);
+			var edgePos = GetPositionOnEdge(emptiestNeighbour);
 			var height = Mathf.Max(surfaceMarkerMax.transform.position.y, target.surfaceMarkerMax.transform.position.y);
 			edgePos.Set(edgePos.x, height, edgePos.z);
 			m.transform.position = edgePos;
 		}
+	}
+
+	/// <summary>
+	/// The neighbour with the most empty space. Otherwise picks at random
+	/// </summary>
+	/// <returns>The emptiest nieghbour.</returns>
+	private Neighbours FindEmptiestNieghbour()
+	{
+		var neighbourPop = new List<KeyValuePair<Neighbours, int>>(4);
+
+		var directions = Enum.GetValues(typeof(Neighbours)).Cast<Neighbours>().ToList();
+		foreach(var dir in directions)
+		{
+			var n = this[dir];
+			if(n != null)
+			{
+				var space = n.maxPopulation - n.population.Count;
+				neighbourPop.Add(new KeyValuePair<Neighbours, int>(dir, space));
+			}
+		}
+
+		neighbourPop.Sort( (a, b) => a.Value.CompareTo(b.Value) );
+		return neighbourPop[neighbourPop.Count-1].Key; //Last has most space
 	}
 
 	/// <summary>
