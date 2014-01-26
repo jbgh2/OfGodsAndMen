@@ -215,6 +215,19 @@ public class LandscapeBlock : MonoBehaviour
 
 	public Neighbours GetRandomEdge()
 	{
+		var edge = UnityEngine.Random.Range(0, mNeighbours.Length);
+		var target = mNeighbours[edge];
+		while(target == null)
+		{
+			edge = UnityEngine.Random.Range(0, mNeighbours.Length);
+			target = mNeighbours[edge];
+		}
+
+		return (Neighbours)edge;
+	}
+
+	public Neighbours GetRandomEdge_old()
+	{
 		var numValidEdges = 0;
 		foreach(var n in neighbours)
 		{
@@ -342,8 +355,6 @@ public class LandscapeBlock : MonoBehaviour
 			migrants = eligablePop.GetRange(0, diff);
 		}
 
-		migrants.ForEach( p => { p.currentBlock = this; p.targetBlock = null; } );
-
 		//Work out where to send each migrant
 		//TODO: Make smarter, choose the neighbor with the most space 
 		//but bear in mind what each other migrant is going to do.
@@ -355,7 +366,6 @@ public class LandscapeBlock : MonoBehaviour
 			var edge = GetRandomEdge();
 			var target = this[edge];
 
-			m.targetBlock = target;
 			target.immigrants.Add(m);
 
 			//Position the migrants at the edge of the target block
@@ -363,6 +373,36 @@ public class LandscapeBlock : MonoBehaviour
 			var height = Mathf.Max(surfaceMarkerMax.transform.position.y, target.surfaceMarkerMax.transform.position.y);
 			edgePos.Set(edgePos.x, height, edgePos.z);
 			m.transform.position = edgePos;
+		}
+	}
+
+	/// <summary>
+	/// If there is space on the block, new immigrants settle without problem
+	/// </summary>
+	public void Immigration ()
+	{
+		var space = maxPopulation - population.Count;
+		var numImmigrants = immigrants.Count;
+
+		if(space > 0 && immigrants.Count > 0)
+		{
+			//Room for all, settle them.
+			if(numImmigrants <= space)
+			{
+				immigrants.ForEach( i => AddPopulation(i) );
+				immigrants.Clear();
+			}
+			else
+			{
+				//No room for all, settle some of them.
+				var diff = maxPopulation - population.Count;
+				immigrants.Shuffle();
+				
+				var newPop = immigrants.GetRange(0, diff);
+				newPop.ForEach( i => AddPopulation(i) );
+				immigrants.RemoveRange(0, diff);
+			}
+
 		}
 	}
 

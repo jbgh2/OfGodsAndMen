@@ -30,8 +30,7 @@ public class GameController : MonoBehaviour
 	public int turnsInGame = 3;
 	public int maxAge = 6;
 	public int startingPopulation = 2;
-
-	private bool shownMessage = false;
+	
 	private int godIndex;
 
 	// Use this for initialization
@@ -171,14 +170,6 @@ public class GameController : MonoBehaviour
 
 	}
 
-	private void ShowMessage(string message)
-	{
-		if(!shownMessage) {
-			Debug.Log(message);
-			shownMessage = true;
-		}
-	}
-
 	void Reproduction ()
 	{
 		Debug.Log("Reproduction " + turn);
@@ -208,6 +199,7 @@ public class GameController : MonoBehaviour
 
 		foreach(var b in landscape.blocks)
 		{
+			b.Immigration();
 			totalDead.AddRange( b.Conflict() );
 		}
 

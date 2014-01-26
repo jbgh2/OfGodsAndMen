@@ -89,6 +89,7 @@ public class Landscape : MonoBehaviour
         int row;
         int col;
         int neighbourIndex;
+		LandscapeBlock neighbour;
         for (int i = 0; i < mLandscape.Length; i++)
         {
             block = mLandscape[i];
@@ -97,27 +98,43 @@ public class Landscape : MonoBehaviour
             if (row - 1 > 0)
             {
                 neighbourIndex = IndexFromRowCol(row - 1, col);
-                block[LandscapeBlock.Neighbours.North] = mLandscape[neighbourIndex];
-				mLandscape[neighbourIndex][LandscapeBlock.Neighbours.South] = block;
+				neighbour = mLandscape[neighbourIndex];
+				if(neighbour.Terrain != TerrainType.Water)
+				{
+					block[LandscapeBlock.Neighbours.North] = mLandscape[neighbourIndex];
+					mLandscape[neighbourIndex][LandscapeBlock.Neighbours.South] = block;
+				}
             }
             if (row + 1 < mHeight)
             {
                 neighbourIndex = IndexFromRowCol(row + 1, col);
-                block[LandscapeBlock.Neighbours.South] = mLandscape[neighbourIndex];
-				mLandscape[neighbourIndex][LandscapeBlock.Neighbours.North] = block;
+				neighbour = mLandscape[neighbourIndex];
+				if(neighbour.Terrain != TerrainType.Water)
+				{
+					block[LandscapeBlock.Neighbours.South] = mLandscape[neighbourIndex];
+					mLandscape[neighbourIndex][LandscapeBlock.Neighbours.North] = block;
+				}
 			}
             if (col - 1 > 0)
             {
                 neighbourIndex = IndexFromRowCol(row, col - 1);
-                block[LandscapeBlock.Neighbours.West] = mLandscape[neighbourIndex];
-				mLandscape[neighbourIndex][LandscapeBlock.Neighbours.East] = block;
+				neighbour = mLandscape[neighbourIndex];
+				if(neighbour.Terrain != TerrainType.Water)
+				{
+					block[LandscapeBlock.Neighbours.West] = mLandscape[neighbourIndex];
+					mLandscape[neighbourIndex][LandscapeBlock.Neighbours.East] = block;
+				}
 
             }
             if (col + 1 < mWidth)
             {
                 neighbourIndex = IndexFromRowCol(row, col + 1);
-                block[LandscapeBlock.Neighbours.East] = mLandscape[neighbourIndex];
-				mLandscape[neighbourIndex][LandscapeBlock.Neighbours.West] = block;
+				neighbour = mLandscape[neighbourIndex];
+				if(neighbour.Terrain != TerrainType.Water)
+				{
+					block[LandscapeBlock.Neighbours.East] = mLandscape[neighbourIndex];
+					mLandscape[neighbourIndex][LandscapeBlock.Neighbours.West] = block;
+				}
 
             }
         }
