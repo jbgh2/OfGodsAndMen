@@ -506,10 +506,38 @@ public class LandscapeBlock : MonoBehaviour
 
 	/// <summary>
 	/// See if some of the population will convert to a different religion
+	/// Work down pop from oldest to youngest. Pick a random pop, try and convert.
+	/// Atheists don't convert others.
 	/// </summary>
 	public void Conversion()
 	{
+		var t = new List<Population>(population);
 
+		t.Sort( (a, b) => a.age.CompareTo(b.age) );
+		t.Reverse();
+
+		foreach(var attacker in t)
+		{
+			//Atheists don't convert
+			if(attacker.owner == parent.game.nullGod)
+				continue;
+
+			var defender = t.Random();
+
+			if(attacker.owner == defender.owner)
+				continue;
+
+			//Attacker roll d6 + age difference.
+			//Wins if greater than defenders age or 6
+			var attackerBaseRoll = UnityEngine.Random.Range(1, 7);
+			var attackerRoll = attackerBaseRoll + (attacker.age - defender.age);
+
+			if(attackerBaseRoll == 6 || attackerRoll > defender.age)
+			{
+				defender.owner = attacker.owner;
+			}
+
+		}
 	}
 
 	/// <summary>

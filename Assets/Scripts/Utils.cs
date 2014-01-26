@@ -28,4 +28,15 @@ static class MyExtensions
 			list[n] = value;
 		}
 	}
+
+	public static int RandomIndex<T>(this IList<T> list)
+	{
+		return ThreadSafeRandom.ThisThreadsRandom.Next(0, list.Count);
+	}
+
+	public static T Random<T>(this IList<T> list)
+	{
+		return list[list.RandomIndex()];
+	}
+
 }

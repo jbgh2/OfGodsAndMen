@@ -30,8 +30,12 @@ public class Population : MonoBehaviour
 	public God owner {
 		get { return mOwner; }
 		set {
-			mOwner = value;
-			//label.color = mOwner.color;
+			if(mOwner != value)
+			{
+				mOwner = value;
+				//label.color = mOwner.color;
+				body.renderer.material.color = mOwner.color;
+			}
 		}
 	}
 
