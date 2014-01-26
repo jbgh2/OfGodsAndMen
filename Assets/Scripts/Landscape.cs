@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+using SimplexNoise;
+
 public class Landscape : MonoBehaviour 
 {
 	public enum TerrainType
@@ -29,12 +31,14 @@ public class Landscape : MonoBehaviour
 	{
 		TerrainType[] allValues =
 			(TerrainType[])Enum.GetValues(typeof(TerrainType));
-		TerrainType value = allValues[UnityEngine.Random.Range(0, allValues.Length)]; //not water
+		TerrainType value = allValues[UnityEngine.Random.Range(0, allValues.Length)];
 		
 		return value;
 	}
 
 	public bool ShowNeighbours = false;
+	public bool terrainUsingNoise = true;
+	public int noiseSeed = -1;
     public int NumRows = 3;
     public int NumColumns = 3;
     public GameObject LandscapeBlockPrefab = null;
@@ -68,14 +72,19 @@ public class Landscape : MonoBehaviour
         mHeight = NumRows;
 
         //Create blocks
-        CreateBlocks();
+		CreateBlocks();
 
-		//Create terrain
-		for (int i = 0; i < mLandscape.Length; i++)
+		if(terrainUsingNoise)
+			CreateTerrainFromNoise();
+		else
 		{
-			var terrain = Landscape.RandomTerrainType();
-			mLandscape[i].Terrain = terrain;
-			mLandscape[i].maxPopulation = TerrainPopulation[terrain];
+			//Create terrain
+			for (int i = 0; i < mLandscape.Length; i++)
+			{
+				var terrain = Landscape.RandomTerrainType();
+				mLandscape[i].Terrain = terrain;
+				mLandscape[i].maxPopulation = TerrainPopulation[terrain];
+			}
 		}
 
         //Wire up connections between blocks
@@ -141,6 +150,49 @@ public class Landscape : MonoBehaviour
             }
         }
     }
+
+	private void CreateTerrainFromNoise()
+	{
+		//Init
+		byte[] seeds = new byte[512];
+		var rand = (noiseSeed < 0) ? new System.Random() : new System.Random(noiseSeed) ;
+		rand.NextBytes(seeds);
+		Noise.perm = seeds;
+
+		//Generate array of noise
+		for (int row = 0; row < mHeight; row++)
+		{
+			for (int col = 0; col < mWidth; col++)
+			{
+				var n = Noise.Generate(row, col);
+
+				//Assume range is -1 to 1
+				var height = (n + 1f) / 2f;
+				height = Mathf.Clamp01(height);
+
+				//Terrain from height
+				var terrain = Landscape.TerrainType.Water;
+				if(height >= 0 && height < 0.1f)
+					terrain = Landscape.TerrainType.Water;
+				else if(height >= 0.1f && height < 0.15f)
+					terrain = Landscape.TerrainType.Desert;
+				else if(height >= 0.15f && height < 0.4f)
+					terrain = Landscape.TerrainType.Plains;
+				else if(height >= 0.4f && height < 0.6f)
+					terrain = Landscape.TerrainType.Forest;
+				else if(height >= 0.6f && height < 0.9f)
+					terrain = Landscape.TerrainType.Hills;
+				else
+					terrain = Landscape.TerrainType.Mountain;
+
+				var i = IndexFromRowCol(row, col);
+				mLandscape[i].Terrain = terrain;
+				mLandscape[i].maxPopulation = TerrainPopulation[terrain];
+
+
+			}
+		}
+	}
 
     private void CreateBlocks()
     {
