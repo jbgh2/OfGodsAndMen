@@ -149,17 +149,6 @@ public class LandscapeBlock : MonoBehaviour
 
 		parent.selectedBlock = this;
 		return;
-
-/*
-		if(colorTweener == null)
-			colorTweener = HOTween.To(renderer.material, 1.0f, new TweenParms().Loops(-1, LoopType.Yoyo).Prop("color", Color.grey));
-		else
-		{
-			colorTweener.Kill();
-			colorTweener = null;
-			HOTween.To(renderer.material, 0.5f, new TweenParms().Prop("color", originalColor));
-		}
-*/
 	}
 
 	public void AddPopulation(Population newPop)
@@ -227,35 +216,7 @@ public class LandscapeBlock : MonoBehaviour
 
 		return (Neighbours)edge;
 	}
-
-	public Neighbours GetRandomEdge_old()
-	{
-		var numValidEdges = 0;
-		foreach(var n in neighbours)
-		{
-			if(n != null)
-				numValidEdges++;
-		}
-
-		var chosenValidEdge = UnityEngine.Random.Range(0, numValidEdges);
-
-		var currentEdge = 0;
-		Neighbours edge = Neighbours.North;
-		for(int i = 0; i < mNeighbours.Length; i++)
-		{
-			var n = mNeighbours[i];
-			if(n != null)
-			{
-				if(currentEdge == chosenValidEdge)
-					edge = (Neighbours)i;
-				else
-					currentEdge++;
-			}
-		}
-
-		return edge;
-	}
-
+	
 	public Vector3 GetPositionOnEdge(Neighbours edge)
 	{
 		Vector3 pos = Vector3.zero;
@@ -399,7 +360,26 @@ public class LandscapeBlock : MonoBehaviour
 		}
 
 		neighbourPop.Sort( (a, b) => a.Value.CompareTo(b.Value) );
-		return neighbourPop[neighbourPop.Count-1].Key; //Last has most space
+
+		bool allTheSame = true;
+		int value = neighbourPop[0].Value;
+		if(neighbourPop.Count > 1)
+		{
+			for (int i = 1; i < neighbourPop.Count; i++)
+			{
+				var t = neighbourPop[i].Value;
+				if(t != value)
+				{
+					allTheSame = false;
+					break;
+				}
+			}
+		}
+
+		if(allTheSame)
+			return neighbourPop.Random().Key;
+		else
+			return neighbourPop[neighbourPop.Count-1].Key; //Last has most space
 	}
 
 	/// <summary>
